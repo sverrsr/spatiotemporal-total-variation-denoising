@@ -3,7 +3,7 @@ Authors: **[Yunhui Gao](https://github.com/Yunhui-Gao)** (gyh21@mails.tsinghua.e
 
 
 ## Usage
-First download the `.zip` files of the data by clicking the following links [here](https://cloud.tsinghua.edu.cn/f/350454931548480dad4e/?dl=1) or contact the authors through email. Then unzip file `GX.zip` at the corresponding folder `data/experiment/GX`, where `X` denotes the group number.
+First download the `.zip` files of the data by clicking the following links or contact the authors through email. Then unzip file `GX.zip` at the corresponding folder `data/experiment/GX`, where `X` denotes the group number.
 
 * Group 1: [`G1.zip`](https://cloud.tsinghua.edu.cn/f/307eb64e574a4af0a6b5/?dl=1)
 * Group 2: [`G2.zip`](https://cloud.tsinghua.edu.cn/f/2f09c876b7bf4bb1bb4c/?dl=1)
