@@ -81,11 +81,11 @@ save([cache_path_name,'/measurement.mat'],'y')
 % =========================================================================
 
 
-K = 49;        % batch size (# of images)
+K = 100;        % batch size (# of images)
 
 frame_start = 1;
 frame_step = 50;
-frame_end = 49;
+frame_end = K_total;
 
 for frame = frame_start:frame_step:frame_end-K+1
     
