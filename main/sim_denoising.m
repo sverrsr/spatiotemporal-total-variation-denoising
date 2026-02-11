@@ -14,34 +14,51 @@ clear all;
 close all;
 clc;
 
-foldername = '../data/simulation';
+foldername = 're2500_weInf_surfElev_first2089_B1024_rayTrace_D3pi_png';
 
-% load test video
-clipname = 'akiyo';
-img = imread([foldername,'/',clipname,'/1.png']);
-[n1,n2,~] = size(img);
-K = 100;
+% get all png files in folder
+files = dir(fullfile(foldername, '*.png'));
+assert(~isempty(files), 'No PNG files found.');
+
+% sort by filename (important for time order)
+[~, idx] = sort({files.name});
+files = files(idx);
+
+K = numel(files);
+
+% read first image to get size
+img = im2double(imread(fullfile(foldername, files(1).name)));
+[n1,n2] = size(img);
+
 x = zeros(n1,n2,K);
-for k = 1:K
-    img = im2double(imread([foldername,'/',clipname,'/',num2str(k),'.png']));
+x(:,:,1) = img;
+
+% read remaining frames
+for k = 2:K
+    img = im2double(imread(fullfile(foldername, files(k).name)));
     x(:,:,k) = img;
 end
 
-% add additive white gaussian noise
-rng(0)
+% % add additive white gaussian noise
+% rng(0)
+% snr_val = 10;
+% y = awgn(x,snr_val);
+
+y = x;
+
+% figure
+% for k = 1:K
+%     ax=subplot(1,2,1);imshow(x(:,:,k),[0,1]);
+%     title(ax,'Ground-truth video')
+%     ax=subplot(1,2,2);imshow(y(:,:,k),[0,1]);
+%     title(ax,'Noisy video')
+%     drawnow;
+% end
+
 snr_val = 10;
-y = awgn(x,snr_val);
 
-figure
-for k = 1:K
-    ax=subplot(1,2,1);imshow(x(:,:,k),[0,1]);
-    title(ax,'Ground-truth video')
-    ax=subplot(1,2,2);imshow(y(:,:,k),[0,1]);
-    title(ax,'Noisy video')
-    drawnow;
-end
+cache_path_name = fullfile('cache', foldername, num2str(snr_val));
 
-cache_path_name = ['cache/sim/',clipname,'/',num2str(snr_val)];
 if ~isfolder(cache_path_name)
     mkdir(cache_path_name)
 end
@@ -54,21 +71,36 @@ save([cache_path_name,'/measurement.mat'],'y','x')
 lam_s = 0.8e-1;     % spatial regularization coefficient
 lam_t = 3e-1;       % temporal regularization coefficient
 
-n_iters = 200;      % number of iterations
+n_iters = 1;      % number of iterations
 
 % define auxilary variables
 w_est = zeros(n1,n2,n3,3);
 v_est = zeros(n1,n2,n3,3);
 
+y = single(y); v_est = single(v_est); w_est = single(w_est);
+
+% --- choose GPU if available, otherwise fall back to CPU
 gpu = true;
+
+if gpu
+    try
+        device = gpuDevice();   % will error if no supported GPU
+        reset(device);
+        y     = gpuArray(y);
+        v_est = gpuArray(v_est);
+        w_est = gpuArray(w_est);
+        fprintf("Using GPU: %s\n", device.Name);
+    catch ME
+        warning("GPU disabled (%s). Falling back to CPU.");
+        gpu = false;
+    end
+end
 
 % initialize GPU
 if gpu
-    device  = gpuDevice();
-    reset(device)
-    y       = gpuArray(y);
-    v_est   = gpuArray(v_est);
-    w_est   = gpuArray(w_est);
+    y     = gather(y);
+    w_est = gather(w_est);
+    reset(device);
 end
 
 % main loop
