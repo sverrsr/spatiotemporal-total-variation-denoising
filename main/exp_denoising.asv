@@ -18,7 +18,7 @@ clc;
 grp_num = 2;
 
 %% My part
-foldername = 'C:\Users\sverr\Documents\NTNU\Prosjekt\Experiments\imageAndVideoConversion\re2500_weInf_surfElev_first2089_B1024_rayTrace_D3pi_png';
+foldername = 'C:\Users\sverr\Documents\NTNU\Prosjekt\Experiments\imageAndVideoConversion\re2500_weInf_surfElev_first2089_B1024_rayTrace_D3pi';
 cache_path_name = fullfile('cache_raw_try_all','png_input');
 
 gpu = false;
@@ -181,12 +181,10 @@ end
 % Post-process denoised videos
 % =========================================================================
 
-
-K = 100;        % batch size (# of images)
-
+K = 49;    % batch size
 frame_start = 1;
 frame_step = 50;
-frame_end = K_total;
+frame_end = 49;
 
 vid = zeros(size(y));
 
